@@ -39,6 +39,16 @@ module FibonacciHeap
       tmp
     end
 
+    def union(heap)
+      @min.concatenate!(heap.min)
+      @min = heap.min if heap.min.key < @min.key
+    end
+
+    def delete(node)
+      decrease_key(node, -Float::INFINITY)
+      delete_min!
+    end
+
     def delete_min!
       @n -= 1
       min_children = @min.child

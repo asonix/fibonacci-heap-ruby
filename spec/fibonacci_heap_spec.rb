@@ -61,4 +61,26 @@ RSpec.describe FibonacciHeap do
     expect(f.min.key).to eq(1)
     expect(f.min.parent).to be_nil
   end
+
+  it "joins two heaps" do
+    f = FibonacciHeap.new
+    f.insert(3)
+
+    f2 = FibonacciHeap.new
+    f2.insert(2)
+
+    f.union(f2)
+    expect(f.min.key).to eq(2)
+    expect(f.min.right.key).to eq(3)
+  end
+
+  it "deletes a key" do
+    f = FibonacciHeap.new
+
+    nodes = (1..8).map { |x| f.insert(x) }
+
+    f.delete(nodes[2])
+
+    expect(f.min.key).to eq(1)
+  end
 end
