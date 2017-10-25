@@ -35,6 +35,8 @@ module FibonacciHeap
           @min = tmp
         end
       end
+
+      tmp
     end
 
     def delete_min!
@@ -60,7 +62,64 @@ module FibonacciHeap
       @ranks = Hash.new
     end
 
+    def print
+      print_node(@min)
+    end
+
+    def decrease_key(node, new_key)
+      return unless new_key < node.key
+
+      node.key = new_key
+      root = @min
+      @min = node if node.key < @min.key
+
+      return if node.parent.nil?
+      return unless node.key < node.parent.key
+
+      prune(node, root)
+    end
+
     private
+
+    def print_node(node, depth = 0)
+      return if node.nil?
+
+      first = node
+      iterator = first
+
+      tabs = '  ' * depth
+
+      loop do
+        puts "#{tabs}#{iterator.key}#{iterator.marked? ? '*' : ''}:"
+        print_node(iterator.child, depth + 1)
+
+        break if iterator.right == first
+        iterator = iterator.right
+      end
+    end
+
+
+    def prune(node, root)
+      return if node.parent.nil?
+
+      @trees += 1
+      parent = node.parent
+      parent.rank -= 1
+
+      parent.child = node.left if node == parent.child
+      parent.child = nil if node == parent.child
+
+      node.delete!
+
+      root.concatenate!(node)
+      node.moved!
+
+      if parent.marked?
+        prune(parent, root)
+      else
+        parent.mark!
+      end
+    end
 
     def consolidate!(node = nil)
       node ||= @min
@@ -131,7 +190,7 @@ module FibonacciHeap
   end
 
   class Node
-    attr_reader :key
+    attr_accessor :key
     attr_accessor :parent
     attr_accessor :child
     attr_accessor :rank
@@ -174,6 +233,7 @@ module FibonacciHeap
       loop do
         iterator.parent = @parent
         break if iterator.left == l2
+        iterator = iterator.left
       end
 
       l1l = @left
