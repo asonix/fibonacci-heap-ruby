@@ -29,7 +29,7 @@ module FibonacciHeap
       if @min.nil?
         @min = tmp
       else
-        Heap.concatenate(@min, tmp)
+        @min.concatenate!(tmp)
 
         if key < @min.key
           @min = tmp
@@ -52,17 +52,19 @@ module FibonacciHeap
 
         @min.delete!
 
-        Heap.concatenate(tmp_root, min_children)
+        tmp_root.concatenate!(min_children)
         find_min_and_reset_rank(tmp_root)
       end
 
-      consolidate(@min)
+      consolidate!
       @ranks = Hash.new
     end
 
     private
 
-    def consolidate(node)
+    def consolidate!(node = nil)
+      node ||= @min
+
       return if @ranks.size == @trees
 
       if @ranks[node.rank].nil? || @ranks[node.rank] == node
@@ -75,23 +77,21 @@ module FibonacciHeap
             make_child(node, @ranks[node.rank])
           end
 
-        consolidate(node)
+        consolidate!(node)
       end
 
-      consolidate(node.right)
+      consolidate!(node.right)
     end
 
     def make_child(node, child_node)
-      puts "making #{child_node.key} a child of #{node.key}"
       @trees -= 1
-      puts "trees: #{@trees}"
-
       child_node.delete!
 
       if node.child.nil?
         node.child = child_node
+        node.child.parent = node
       else
-        Heap.concatenate(node.child, child_node)
+        node.child.concatenate!(child_node)
       end
 
       @ranks.delete(node.rank)
@@ -128,24 +128,11 @@ module FibonacciHeap
         end
       end
     end
-
-    def self.concatenate(list1, list2)
-      return if list1.nil? || list2.nil?
-
-      list1_left = list1.left
-      list2_left = list2.left
-
-      list1.left = list2_left
-      list2.left = list1_left
-
-      list1_left.right = list2
-      list2_left.right = list1
-    end
   end
 
   class Node
     attr_reader :key
-    attr_reader :parent
+    attr_accessor :parent
     attr_accessor :child
     attr_accessor :rank
     attr_accessor :left
@@ -177,6 +164,26 @@ module FibonacciHeap
       @right.left = @left
       @right = self
       @left = self
+    end
+
+    def concatenate!(l2)
+      return if l2.nil?
+
+      iterator = l2
+
+      loop do
+        iterator.parent = @parent
+        break if iterator.left == l2
+      end
+
+      l1l = @left
+      l2l = l2.left
+
+      l1l.right = l2
+      l2.left = l1l
+
+      l2l.right = self
+      @left = l2l
     end
   end
 end
