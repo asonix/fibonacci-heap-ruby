@@ -20,11 +20,11 @@ module FibonacciHeap
       @ranks = Hash.new
     end
 
-    def insert(key)
+    def insert(key, value)
       @n += 1
       @trees += 1
 
-      tmp = Node.new(key)
+      tmp = Node.new(key, value)
 
       if @min.nil?
         @min = tmp
@@ -201,14 +201,16 @@ module FibonacciHeap
 
   class Node
     attr_accessor :key
+    attr_reader :value
     attr_accessor :parent
     attr_accessor :child
     attr_accessor :rank
     attr_accessor :left
     attr_accessor :right
 
-    def initialize(key)
+    def initialize(key, value)
       @key = key
+      @value = value
       @rank = 0
       @mark = false
 

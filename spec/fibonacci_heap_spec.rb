@@ -13,7 +13,7 @@ RSpec.describe FibonacciHeap do
 
   it "inserts a key" do
     f = FibonacciHeap.new
-    f.insert(2)
+    f.insert(2, 'hey')
 
     expect(f.min).to_not be_nil
     expect(f.min.key).to eq(2)
@@ -21,8 +21,8 @@ RSpec.describe FibonacciHeap do
 
   it "inserts multiple keys" do
     f = FibonacciHeap.new
-    f.insert(2)
-    f.insert(3)
+    f.insert(2, 'hey')
+    f.insert(3, 'hi')
 
     expect(f.min).to_not be_nil
     expect(f.min.key).to eq(2)
@@ -37,7 +37,7 @@ RSpec.describe FibonacciHeap do
   it "deletes the minimum key" do
     f = FibonacciHeap.new
 
-    (1..8).each { |x| f.insert(x) }
+    (1..8).each { |x| f.insert(x, x) }
 
     f.delete_min!
 
@@ -47,7 +47,7 @@ RSpec.describe FibonacciHeap do
   it "properly decreases a key" do
     f = FibonacciHeap.new
 
-    nodes = (1..8).map { |x| f.insert(x) }
+    nodes = (1..8).map { |x| f.insert(x, x) }
 
     f.delete_min!
 
@@ -64,10 +64,10 @@ RSpec.describe FibonacciHeap do
 
   it "joins two heaps" do
     f = FibonacciHeap.new
-    f.insert(3)
+    f.insert(3, 'hey')
 
     f2 = FibonacciHeap.new
-    f2.insert(2)
+    f2.insert(2, 'hi')
 
     f.union(f2)
     expect(f.min.key).to eq(2)
@@ -77,7 +77,7 @@ RSpec.describe FibonacciHeap do
   it "deletes a key" do
     f = FibonacciHeap.new
 
-    nodes = (1..8).map { |x| f.insert(x) }
+    nodes = (1..8).map { |x| f.insert(x, x) }
 
     f.delete(nodes[2])
 
